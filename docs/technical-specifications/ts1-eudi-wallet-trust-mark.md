@@ -31,8 +31,8 @@ https://creativecommons.org/licenses/by/4.0/
 | `1.0`   | 2025-04-25 | Final version (v1.0)                                                       |
 | `1.1`   | 2025-11-14 | Updated version (v1.1) with JSON schemas for Trust Mark resources          |
 | `1.1.1` | 2025-11-18 | Editorial and typo fixes to version v1.1                                   |
-| `1.1.2` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
-
+| `1.1.2` | 2026-01-30 | Editorial update (licensing and reuse clarification)                       |
+| `1.2`   | 2026-06-03 | Updated version based on outcome of topic U refinement round  within the European Digital Identity Cooperation Group (EDICG)  |
 
 ## 1 Introduction and Overview
 
@@ -60,7 +60,7 @@ As the Regulation does not specify what verifiable means, or where it shall be d
 
 This document does not address the visual or user experience related design elements related to the trust mark; these are provided separately by the European Commission and may be derived from the final requirements listed in this specification.
 
- >NOTE 1: The presence and rendering of the EUDI Wallet Trust Mark in a Wallet Unit could also be bound to validity of the WUA. The third parties or European Commission MAY later decide to operate a wallet certification verification service based on presenting the WUA for this service, thus allowing on-demand verification of the Wallet Solution certification status for the User. The operating principle of this simple verification service is specified broadly in Section 2.2, and any requirements or components related to it marked as **OPTIONAL** in Sections 3 and 4 detailing exact technical solution.
+ >NOTE 1: The presence and rendering of the EUDI Wallet Trust Mark in a Wallet Unit could also be bound to validity of the Wallet Instance Attestation (WIA). The third parties or European Commission MAY later decide to operate a wallet certification verification service based on presenting a WIA for this service, thus allowing on-demand verification of the Wallet Solution certification status for the User. The operating principle of this simple verification service is specified broadly in Section 2.2, and any requirements or components related to it marked as **OPTIONAL** in Sections 3 and 4 detailing exact technical solution.
 >
 >NOTE 2: Any possible requirements for trust indicators unrelated to the EUDI Wallet Solution are out of scope of this document. **The scope is the trust mark visible in the EUDI Wallet, not the Relying Party services and/or the Attestation Provider qualifications**. The Trust Mark analysis and solution may at a later stage be extended to other elements of the European Digital Identity ecosystem, so that the Users can be informed regarding the reliability and trustworthiness of the different Relying Parties they interact with.
 
@@ -100,7 +100,7 @@ As a conclusion on the overview section, the approach for introducing the EUDI W
 
 ### 2.1 Trust Mark UI view with links to trusted list of EUDI Wallets and Wallet certification information page
 
-The proposed solution is to arrange any trust mark graphical elements (logo, image,...) and localised information about the wallet certification to the Wallet Unit by providing a set of necessary links to the data in a new (metadata-) object. This data can, depending on the build process of the Wallet Provider, be delivered prior to Wallet distribution, or provided online from the URL provided to the Wallet Provider. The latter approach should be synchronised with the Wallet Unit activation where the initial Wallet Unit Attestation (WUA)is issued.
+The proposed solution is to arrange any trust mark graphical elements (logo, image,...) and localised information about the wallet certification to the Wallet Unit by providing a set of necessary links to the data in a new (metadata-) object. This data can, depending on the build process of the Wallet Provider, be delivered prior to Wallet distribution, or provided online from the URL provided to the Wallet Provider. The latter approach should be synchronised with the Wallet Unit activation where the initial Wallet Instance Attestation (WIA)is issued to a User's EUDI Wallet.
 
 The localised, human readable information, including the links to use for reviewing the certification status of the Wallet Solution of the User SHALL be rendered in user-friendly manner on Wallet Provider preferred UI view/views (all meeting the requirements set for the Wallet Users in section 2.1) combined with the presentation of EUDI Wallet Trust Mark graphical elements.
 
@@ -114,9 +114,9 @@ Figure 1. Welcome view of an EUDI Wallet with Trust Mark logo with text and info
 
 ### 2.2 EUDI Wallet verification tool (a service concept)
 
-For a general technical note, the issuance of the WUA upon Wallet Unit activation allows creation of third party services that could function as on-demand Wallet verification services, issuing the Wallet Unit a suitable 'statement attestation' in exchange of the User presenting a valid WUA to this service. This attestation would work for the Users as a *visible* local cryptographic proof of the status of their Wallet Solution certification, aside of the user-invisible WUA.
+For a general technical note, the issuance of the WIA upon Wallet Unit activation allows creation of third party services that could function as on-demand Wallet verification services, issuing the Wallet Unit a suitable 'statement attestation' in exchange of the User presenting a valid WIA to this service. This attestation would work for the Users as a *visible* local cryptographic proof of the status of their Wallet Solution certification, aside of the user-invisible WIA.
 
-This technical specification does not mandate provisioning of a separate EUDI Wallet verifier service by the European Commission or by any other ecosystem stakeholders. Functionality and requirements of services handling WUA verification in context of the EUDI Wallet Trust Mark (outside the WUA verification use cases already in the ARF) may be specified later. The concept is carried along in the specification architecture (Section 4) marked as OPTIONAL, and related requirements and components are marked with asterisk ('\*').
+This technical specification does not mandate provisioning of a separate EUDI Wallet verifier service by the European Commission or by any other ecosystem stakeholders. Functionality and requirements of services handling WIA verification in context of the EUDI Wallet Trust Mark (outside the WIA verification use cases already in the ARF) may be specified later. The concept is carried along in the specification architecture (Section 4) marked as OPTIONAL, and related requirements and components are marked with asterisk ('\*').
 
 ## 3 Actor-Oriented Requirements
 
@@ -138,7 +138,7 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 **EWTM-U4**: As a user of a EUDI Wallet, after installation, I want a means to check that the EUDI Wallet Solution certification is legitimate as part of the EUDI Wallet Instance activation.
 
-> Note: Certification related information is made available to the EUDI Wallet Unit via the WUA issuance.
+> Note: Certification related information is made available to the EUDI Wallet Unit via the WIA issuance.
 
 **EWTM-U5**: As a User of a EUDI Wallet, I want a means to check on demand if the EUDI Wallet Unit that I am currently using is a Certified EUDI Wallet.
 
@@ -174,7 +174,7 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 **EWTM-WP5**: As a Wallet Provider, I need online access to the EUDI Wallet Trust Mark logo and localised information texts about the Trust Mark and/or certification from the European Commission.
 
-> Note: This online information data object is needed for the Wallet Unit to customise the UI view to the localisation language used by the User's mobile device. This data is accessible upon issuance of the issuance WUA to the Wallet Unit. See *TrustMarkResourceURL*.
+> Note: This online information data object is needed for the Wallet Unit to customise the UI view to the localisation language used by the User's mobile device. This data is accessible upon issuance of the initial WIA to the Wallet Unit. See *TrustMarkResourceURL*.
 
 **EWTM-WP6**: As a Wallet Provider I want to be able to link from the Wallet Unit's UI view with the EUDI Wallet Trust Mark graphics and information text to the European Commission-provided link to the eIDAS Dashboard page that shows the up-to-date list of official certified EUDI Wallets.
 
@@ -200,9 +200,9 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 **EWTM-EC4**: As the European Commission, I want to allocate a new certified EUDI Wallet Solution a unique identifier, so that I can use it as part of the link of **EWTM-EC3** and enable online querying for this EUDI Wallet Solution's certification information via the eIDAS Dashboard.
 
-**EWTM-EC5**: As European Commission, I want to deliver the unique identifier of **EWTM-EC4** to the Wallet Provider, so that Wallet Provider can use the identifier as the WalletSolutionID value in the (issuance) Wallet Unit Attestations it issues to individual Wallet Units of the certified Wallet Solution.
+**EWTM-EC5**: As European Commission, I want to deliver the unique identifier of **EWTM-EC4** to the Wallet Provider, so that Wallet Provider can use this identifier as part of the `wallet_solution_certification_information` value in the Wallet Instance Attestations it issues to individual Wallet Units of the certified Wallet Solution.
 
-> Note: See WalletSolutionID in \[Issuance WUA Specification\].
+> Note: See `wallet_solution_certification_information` in \[Issuance WUA Specification\].
 
 **EWTM-EC6**: As European Commission, I want the Member States to inform me within 24 hours if a given Wallet Solution has been revoked, so that I can remove it from the official online list of certified EUDI Wallet Solutions.
 
@@ -218,7 +218,7 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 The realisation of the EUDI Wallet Trust Mark as specified in Section 4.2 is dependent on providing the Wallet Solution (or individual Wallet Unit) access to necessary machine-readable information latest upon Wallet Unit activation. The EUDI Wallet Trust Mark itself will have graphical appearance and informatory texts as defined and released by the European Commission. Rendering of these assets on the Wallet Unit is  enabled through providing access to those as URLs, so that the Wallet Solution development team (or if UI view configuration is updated after the app compilation and delivery, each Wallet Unit individually) can receive the information.
 
-A Wallet Unit that needs this information in activation stage (does not have the information provide in the compiled Wallet Solution asset) SHALL be able to download these resources by utilising WalletTrustMarkInformation data (see Table 1) provided to the Wallet Provider. This information SHALL be provided to the Wallet Unit by the Wallet Provider in parallel to its initial WUA issuance.
+A Wallet Unit that needs this information in activation stage (does not have the information provide in the compiled Wallet Solution asset) SHALL be able to download these resources by utilising WalletTrustMarkInformation data (see Table 1) provided to the Wallet Provider. This information SHALL be provided to the Wallet Unit by the Wallet Provider in parallel to its initial WIA issuance.
 
 The data object `WalletTrustMarkInformation` contents are defined in Table 1, and JSON schema provided in [Annex A.1](#a1-wallettrustmarkinformation-json-schema-normative). The information SHALL be delivered for the Wallet Provider for Wallet Solution configurability purposes either pre-distribution or on-demand, as described in [Section 4.2](#42-solution-architecture). The on-demand delivery SHALL, and pre-distribution delivery MAY use the JSON object schema.
 
@@ -229,7 +229,7 @@ The data object `WalletTrustMarkInformation` contents are defined in Table 1, an
 | TrustMarkResourceURL         | URL of the official EUDI Wallet Trust Mark graphics and User Info resources [`TrustMarkResource`](#411-trustmarkresource-object), used for rendering in the Wallet user interface; contents provided and hosted by the EC. | URL | Mandatory |
 | ListOfCertifiedWalletsURL    |  URL of the public list of certified EUDI Wallet Solutions in EU; provided and hosted by the EC. | URL | Mandatory |
 | ListOfCertifiedWalletsQRCode |  QR Code containing the information of ListOfCertifiedWalletsURL | ISO-8859-1 Byte mode QR code | Optional |
-| WalletSolutionInfoPageURL    | URL to the certified Wallet Solution's own information page under the list of certified EUDI Wallet Solutions page. Constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the WalletSolutionID Identifier of the Wallet Solution. *Note: This allows, as necessary, a direct search query from the Wallet user interface to open the individual Wallet Solution page from the list behind the top level of certified Wallets list page*. | URL | Mandatory |
+| WalletSolutionInfoPageURL    | URL to the certified Wallet Solution's own information page under the list of certified EUDI Wallet Solutions page. Constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the uniquely identifying part of `wallet_solution_certification_information` of the Wallet Solution. *Note: This allows, as necessary, a direct search query from the Wallet user interface to open the individual Wallet Solution page from the list behind the top level of certified Wallets list page*. | URL | Mandatory |
 | WalletSolutionInfoPageQRCode |  QR Code containing the information of WalletSolutionInfoPageURL | ISO-8859-1 Byte mode QR code | Optional  |
 | WalletVerifierToolURL* | URL pointing to the official EUDI Wallet Verification Tool's (an Attestation Provider Service) */.well-known/openid-credential-issuer* endpoint used for retrieval of the attestation provider metadata. | URL  | Optional |
 
@@ -262,7 +262,7 @@ The example data object has only three localisation strings for brevity, a full 
 
 #### 4.1.3 WalletSolutionInfoPageURL
 
-the *WalletSolutionInfoPageURL* SHALL point to the individual Wallet Solution's information page under the *ListofCertifiedWalletsURL*. URL SHALL be constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the WalletSolutionID Identifier (see Appendix 1, Table 2 of \[Issuance WUA Specification\] of the certified Wallet Solution and SHALL be provided for the Wallet Provider to be included in the *WalletTrustMarkInformation* data object.
+the *WalletSolutionInfoPageURL* SHALL point to the individual Wallet Solution's information page under the *ListofCertifiedWalletsURL*. URL SHALL be constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the identifying `wallet_solution_certification_information` (see non-normative WIA example in [clause 3.1](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts3-wallet-unit-attestation.md#31-examples) of \[Issuance WUA Specification\]) of the certified Wallet Solution and SHALL be provided for the Wallet Provider to be included in the *WalletTrustMarkInformation* data object.
 
 #### 4.1.4 QR Code versions of page resources
 
@@ -302,17 +302,17 @@ The functions, inputs and outputs of individual systems in the diagram of Figure
 
 **The European Commission**'s responsible unit for the Trust Mark information and listing of certified EUDI Wallets manages that
 
-* (5) The EUDI Wallet Trust Mark materials are available online as required behind a web resource (TrustMarkResourceURL)
-* (6) the certified Wallet Solution is given a WalletSolutionID, information of the Wallet Solution is added to the official list of certified wallets
+* (5) The EUDI Wallet Trust Mark materials are available online as required behind a web resource (*TrustMarkResourceURL*)
+* (6) the certified Wallet Solution is provided its *wallet_solution_certification_information*, information of the Wallet Solution is added to the official list of certified wallets
 * (7) a Wallet Solution specific information page is created and published online
 * (8) OPTIONALLY, the entity (or any 3rd party whatsover) develops, registers and operates the EUDI Wallet Verifier Tool as a wallet-relying party service per description of Section 2.2.
-* (9) The Wallet Provider is sent information required for configuring the certified Wallet Solution and issuing the Wallet Unit Attestation: the assigned *WalletSolutionID*, the *TrustMarkResourceURL*, the *ListOfCertifiedWalletsURL*, the *WalletSolutionInfoPageURL*, and (OPTIONALLY) the *WalletVerifierToolURL*.
+* (9) The Wallet Provider is sent information required for configuring the certified Wallet Solution and issuing the Wallet Unit Attestation: the assigned *wallet_solution_certification_information*, the *TrustMarkResourceURL*, the *ListOfCertifiedWalletsURL*, the *WalletSolutionInfoPageURL*, and (OPTIONALLY) the *WalletVerifierToolURL*.
 
 After receiving the information, the Wallet Provider updates the Wallet Solution asset where needed (10) in order to (11) be able to render the Wallet Solution specific **EUDI Wallet UI view with expected graphics and other information of the Trust Mark** (material and user experience guidelines for which the European Commission is responsible according to requirement **EWTM-EC1**).
 
-The WUA issuance (12) by the Wallet Provider happens at Wallet Unit activation as defined in the ARF and related technical specification (and happens irrespective of the requirements of this specification). It provides the basis for the optional verification tool services.
+The WIA issuance (12) by the Wallet Provider happens at Wallet Unit activation as defined in the ARF and related technical specification (and happens irrespective of the requirements of this specification). It provides the basis for the optional verification tool services.
 
-**The User** can at their discretion view (13) the official EUDI Trust Mark information from the UI view of the EUDI Wallet, and (14) access the EUDI Wallet listing and individual Wallet Solution pages (and OPTIONAL Verifier Tool service, if such are set available to verify the Wallet Solution's certification status against presenting the WUA for verification by the service).
+**The User** can at their discretion view (13) the official EUDI Trust Mark information from the UI view of the EUDI Wallet, and (14) access the EUDI Wallet listing and individual Wallet Solution pages (and OPTIONAL Verifier Tool service, if such are set available to verify the Wallet Solution's certification status against presenting the WIA for verification by the service).
 
 > Note: The guidelines for situations if the Wallet Solution of the User proves to be non-certified for whatever reason (obvious fake, revoked at solution or at instance level) are equally important to showing a positive outcome with graphics and texts of the EUDI Wallet Trust Mark. These 'unhappy flow' scenarios and remedies should be covered in public EUDI Wallet communication materials, they are not subject of this technical specification.
 
@@ -320,7 +320,7 @@ The WUA issuance (12) by the Wallet Provider happens at Wallet Unit activation a
 
 | Reference      | Description |
 |----------------------------------------|----------------------------------------------|
-| [WCAG 2.1 ]                            | [Web Content Accessibility Guide\sion 2.1](https://www.w3.org/TR/WCAG21/) |
+| [WCAG 2.1 ]                            | [Web Content Accessibility Guide\version 2.1](https://www.w3.org/TR/WCAG21/) |
 | [Issuance WUA Specification]           | [Specification of Wallet Unit Attestations (WUA) used in issuance of PID and Attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts3-wallet-unit-attestation.md)                                     |
 |  [OpenID4VCI]                          | [OpenID For Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3)  |
 
