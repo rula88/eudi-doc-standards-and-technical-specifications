@@ -35,6 +35,7 @@ https://creativecommons.org/licenses/by/4.0/
 | `1.4.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 | `1.5`   | 2026-03-15 | Introduced `client_status` object in the WIA containing `status` (Wallet Instance revocation reference) and `exp` (revocation maintenance expiry). Introduced `key_storage_status` object in the WUA (replacing previous overload of `exp` and `status`) containing `status` (WSCD/keystore revocation reference, with two index assignment options -- see below) and `exp` (revocation maintenance expiry). Added optional per-issuer WIA `client_status.status` entry reuse. Removed `iss` from both WIA and WUA; Wallet Provider identity is now inferred from the signing certificate in the `x5c` JOSE header parameter. Removed `storage_type` and `keys_exportable` from WUA. Removed `kid` requirement for the `jwt` PoP header; Wallet Units SHALL sign the `jwt` PoP with the key at index 0 of `attested_keys` and Issuers SHALL verify under that key. Removed `general_info` from both WIA and WUA; Wallet Solution identity is conveyed via `wallet_name`, `wallet_version`, and `wallet_link` in the WIA. Introduced `wallet_solution_certification_information` as a top-level WIA claim. Replaced `storage_certification_information` with the `certification` field defined in Appendix D of OID4VCI. Renamed `preferred_ttl` to `preferred_key_storage_status_period` and introduced `preferred_client_status_period`; both constrain the remaining revocation maintenance period (`client_status.exp` or `key_storage_status.exp` minus current time) rather than `exp`. Added `wallet_version` (REQUIRED) to the WIA; repurposed `wallet_link` as a RECOMMENDED URI for further information about the Wallet Solution. Removed appendix discussing different revocation options. Renamed 'Wallet Unit Attestation (WUA)' to 'Key Attestation (KA)'; repurposed 'WUA' as the umbrella term covering both WIAs and KAs. Introduced two options for `key_storage_status.status` index assignment in KAs: (1) type-shared index, where all Wallet Units using the same WSCD or keystore type share a single status list index (existing behaviour); (2) per-KA index, where each KA is assigned its own fresh index representing the revocation state of the Wallet Unit's WSCD or keystore instance attested in that KA, with an optional per-issuer reuse sub-option analogous to the WIA `client_status.status` per-issuer reuse option. |
 | `1.5.1` | 2026-05-08 | Added two Wallet Unit requirements in Section 2.2.1.1: the Wallet Unit SHALL use the WIA `cnf` key as the DPoP key when requesting an Access Token, and SHALL verify on Access Token receipt that the AT's `cnf.jkt` matches the JWK Thumbprint of the WIA `cnf` key, aborting the issuance session on mismatch. |
+| `1.5.2` | 2026-05-26 | Editorial and normative clarifications from the TS3 implementation review: referenced [OpenID4VCI] Appendix F.4 for KA verification (Section 2.2.2.2); required Wallet Providers to maintain the WIA revocation mechanism until `client_status.exp` (Section 2.4.2); cross-referenced the revocation status check from Sections 2.2.1.2 and 2.2.2.2 to Section 2.4.3; required Attestation Providers to check KA revocation status at issuance (Section 2.4.3); under the per-KA index option, strengthened user-requested WSCD/keystore revocation from optional to mandatory and required revoking all associated `key_storage_status.status` entries (Sections 2.4.2 and 2.5.2); and rolled back the WIA `cnf`/DPoP requirements added in 1.5.1 (Section 2.2.1.1). |
 
 ## 1 Introduction and Overview
 
@@ -121,12 +122,6 @@ A Wallet Provider SHALL ensure that their Wallet Units sends the same WIA to at 
 
 > This is to prevent issuer linkability.
 
-A Wallet Unit SHALL use the `cnf` key in the WIA as the DPoP key when requesting an Access Token from the Authorization Server.
-
-A Wallet Unit SHALL verify, on receipt of an Access Token from the Authorization Server, that the Access Token's `cnf.jkt` matches the JWK Thumbprint of the `cnf` key in the WIA presented in the same issuance session, and abort the issuance session on mismatch.
-
-> These two requirements together ensure that the Access Token is sender-constrained to the same `cnf` key the Wallet Unit presented in its WIA, and that the Wallet Unit will detect any substitution of the WIA at the Token Endpoint by a network adversary. Without this binding, an adversary that substitutes the Wallet Unit's WIA in transit could cause the Access Token to be bound to the adversary's `cnf` key and the issued credential to be associated with the adversary's WIA status index in the PID Provider's records, breaking the chain from the Wallet Instance's revocation to the issued credential.
-
 #### 2.2.1.2 PID Providers and Attestation Providers Responsibilities for Transport of WIAs
 
 When a PID Provider or Attestation Provider receives a WIA, then they SHALL verify that the signature of the WIA verifies under the public key in the signing certificate included in the `x5c` parameter in the JOSE header of the WIA (i.e., the wallet attestation as specified in Appendix E of OID4VCI). The PID Provider or Attestation Provider SHALL moreover verify that this signing certificate can be verified with a trust anchor found on the Trusted List for Wallet Providers, potentially using intermediate certificates included in the `x5c` parameter.
@@ -134,6 +129,8 @@ When a PID Provider or Attestation Provider receives a WIA, then they SHALL veri
 When a PID Provider or Attestation Provider receives a WIA, then they SHALL check that it has not expired.
 
 When a PID Provider or Attestation Provider receives a WIA, then they SHALL check the signature of the PoP verifies under the public key present in the `cnf`.
+
+For the requirement to check the revocation status of the WIA received during issuance, see [Section 2.4.3](#243-pid-provider-and-attestation-provider-responsibilities).
 
 ### 2.2.2 Transport of Key Attestation (KA)
 
@@ -171,11 +168,15 @@ A PID Provider or an Attestation Provider issuing device-bound attestations SHAL
 
 An Attestation Provider issuing non-device-bound attestations SHALL omit the `proof_types_supported` and the `cryptographic_binding_methods_supported` parameters in the Credential Issuer Metadata.
 
+A PID Provider or Attestation Provider receiving a KA SHALL verify it in accordance with [OpenID4VCI] Appendix F.4. The remaining requirements in this section specify additional EUDI-specific verification steps that the PID Provider or Attestation Provider SHALL apply on top of those in Appendix F.4.
+
 If a PID Provider or Attestation Provider receives a KA in a `jwt` or an `attestation`proof type, then they SHALL verify that the signature of the KA verifies under the public key in the signing certificate included in the `x5c` parameter in the JOSE header of the KA (i.e., the key attestation as specified in Appendix D.1 of OID4VCI). The PID Provider or Attestation Provider SHALL moreover verify that this signing certificate can be verified with a trust anchor found on the Trusted List for Wallet Providers, potentially using intermediate certificates included in the `x5c` parameter.
 
 If a PID Provider or Attestation Provider receives a KA in a `jwt` proof type, then they  SHALL verify that the signature of the `jwt` element verifies under the key at index 0 of the `attested_keys` array within the `key_attestation` object included in the `jwt`.
 
 If a PID Provider or Attestation Provider receives a KA in a `jwt` proof type, then they SHALL verify that the `jwt` element includes a valid `c_nonce` from their `nonce_endpoint` in the `nonce` field of the `jwt`. Similarly, if a PID Provider or Attestation Provider receives a KA in a `attestation` proof type, they SHALL verify that the `key_attestation` object includes a valid `c_nonce` from their `nonce_endpoint`.
+
+For the requirement to check the revocation status of the KA received during issuance, see [Section 2.4.3](#243-pid-provider-and-attestation-provider-responsibilities).
 
 ## 2.3 Content
 
@@ -249,6 +250,8 @@ The `exp` sub-field within `client_status` and `key_storage_status` is independe
 
 A Wallet Provider SHALL choose the technical validity period of the KA and SHALL maintain the revocation mechanism, see [Section 2.5](#25-revocation), until `key_storage_status.exp` has passed.
 
+A Wallet Provider SHALL choose the technical validity period of the WIA and SHALL maintain the revocation mechanism, see [Section 2.5](#25-revocation), until `client_status.exp` has passed.
+
 A Wallet Provider SHALL include a `client_status` object in every WIA it issues, with a `status` sub-field referencing a status list entry that represents the revocation state of the Wallet Instance. See [Section 2.5](#25-revocation) for the optional per-issuer reuse of this entry.
 
 A Wallet Provider SHALL include a `client_status` object in every WIA it issues and a `key_storage_status` object in every KA it issues.
@@ -267,7 +270,7 @@ A Wallet Provider SHALL keep track of which WIAs are associated with which Walle
 
 In case a Wallet Unit is to be revoked, a Wallet Provider SHALL revoke all `client_status.status` entries associated with that Wallet Unit. 
 
-Regarding revocation of a WSCD or keystore: If the Wallet Provider uses option 1 (type-shared index), the Wallet Provider SHALL only revoke a `key_storage_status.status` entry if the type of WSCD or keystore has a security vulnerability.  Under Option 2 (per-KA index), the `key_storage_status.status` entries associated with the Wallet Unit's KAs can additionally be revoked upon user request (e.g., due to loss or theft of the WSCD or keystore).
+Regarding revocation of a WSCD or keystore: If the Wallet Provider uses option 1 (type-shared index), the Wallet Provider SHALL only revoke a `key_storage_status.status` entry if the type of WSCD or keystore has a security vulnerability.  Under Option 2 (per-KA index), the Wallet Provider SHALL revoke the `key_storage_status.status` entries associated with the Wallet Unit's KAs upon explicit request of the User to revoke their WSCD or keystore (e.g., due to loss or theft of the WSCD or keystore).
 
 During re-issuance of a PID or attestation (e.g., if the technical validity of a PID or attestation expires before the administrative validity period expires), then the Wallet Unit  SHALL send a new KA (i.e., a KA that has not been used before) in the *Credential Request* to the PID Provider or Attestation Provider.
 
@@ -278,6 +281,8 @@ The technical validity period of a PID SHALL end before the `client_status.exp` 
 Other Attestation Providers (i.e., non-PID Providers) MAY choose a technical validity period of the attestations they issue independently of the `client_status.exp` of the WIA and the `key_storage_status.exp` of the KA received during issuance.
 
 A PID Provider SHALL check the revocation status of **both** the WIA and the KA received during issuance at least once every 24 hours for the validity period of the PID. If either is revoked, the PID Provider SHALL revoke the PID. If PID Providers issue PIDs with a validity period of less than 24 hours, they only need to verify the revocation status of both upon issuance.
+
+Before issuing a device-bound attestation, an Attestation Provider SHALL verify the revocation status of the KA received during issuance. If the KA is revoked, the Attestation Provider SHALL NOT issue the attestation.
 
 > **Note:** In order for PID Providers (and other Attestation Providers) to perform ongoing revocation checks of the WIA, the `client_status` information from the WIA must be made available to the Credential Issuer. Since the WIA is presented to the Authorization Server (as a client attestation) rather than directly to the Credential Issuer, this information must be passed from the Authorization Server to the Credential Issuer by some means. One way to achieve this is to include the relevant `client_status` information in the Access Token issued by the Authorization Server.
 
@@ -313,7 +318,9 @@ If the per-issuer reuse option is not used, the Wallet Provider SHALL assign a f
 
 ### 2.5.2 KA Revocation
 
-Depending on the index assignment option chosen by the Wallet Provider (see below), the `key_storage_status.status` entry in a KA represents either the revocation state of the WSCD or keystore *type* used to store the attested keys (Option 1), or the revocation state of the individual Wallet Unit's WSCD or keystore instance (Option 2). Under both options, a KA SHALL be revoked when a security vulnerability is identified that affects the WSCD or keystore -- for example, a certification withdrawal or a cryptographic weakness becomes known in a specific hardware component. Under Option 1, a single revocation action affects all Wallet Units using that type. Under Option 2, revocation affects only the individual Wallet Unit; additionally, the Wallet Provider MAY revoke the entry upon user request (e.g., due to loss or theft of the device).
+Depending on the index assignment option chosen by the Wallet Provider (see below), the `key_storage_status.status` entry in a KA represents either the revocation state of the WSCD or keystore *type* used to store the attested keys (Option 1), or the revocation state of the individual Wallet Unit's WSCD or keystore instance (Option 2). Under both options, a KA SHALL be revoked when a security vulnerability is identified that affects the WSCD or keystore -- for example, a certification withdrawal or a cryptographic weakness becomes known in a specific hardware component. Under Option 1, a single revocation action affects all Wallet Units using that type. Under Option 2, revocation affects only the individual Wallet Unit; additionally, the Wallet Provider SHALL revoke the entry upon explicit request of the User to revoke their WSCD or keystore (e.g., due to loss or theft of the device).
+
+When revoking a WSCD or keystore under Option 2 (per-KA index), the Wallet Provider SHALL revoke all `key_storage_status.status` entries associated with KAs describing that WSCD or keystore.
 
 Under Option 1, the `key_storage_status.status` entry of a KA SHALL NOT be revoked to express revocation of an individual Wallet Instance; individual Wallet Instance revocation SHALL be expressed through the WIA `client_status.status` entry as described in [Section 2.5.1](#251-wia-revocation-and-optional-per-issuer-status-entry-reuse). Under Option 2, the WIA `client_status.status` entry remains the primary means of Wallet Instance revocation, but the `key_storage_status.status` entries associated with that Wallet Unit's KAs MAY also be revoked to reflect that the individual Wallet Unit's WSCD or keystore instance is no longer trusted.
 
