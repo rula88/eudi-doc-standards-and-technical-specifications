@@ -30,6 +30,7 @@ https://creativecommons.org/licenses/by/4.0/
 | `0.3`   | 2025-07-11 | Updated after second focus group meeting. |
 | `1.0`   | 2025-07-28 | Final version after the Coordination Group review period. |
 | `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
+| `1.1`   | 2026-05-28 | Added Verifier Wallet Unit authentication requirement; updated Appendix A accordingly. |
 
 ## 1. Introduction
 
@@ -233,8 +234,8 @@ Below is an example of a presentation offer using CBOR Diagnostic Notation (CDN)
 
 **STS9_29** All `IntentToRetain` flags SHALL be set to `false` in a mdoc request used in a W2W interaction.
 
-**STS9_30** The optional `ReaderAuth` field SHALL NOT be included in an mdoc request used in a W2W interaction.
-> For a discussion of this see [Appendix A Security Objectives and Mechanisms](#appendix-a-security-objectives-and-mechanisms).
+**STS9_30** In a W2W interaction, the Verifier Wallet Unit SHALL be authenticated by the Holder Wallet Unit as a genuine, non-revoked EUDI Wallet Unit operated by a recognised Wallet Provider, within the protocol session in which the mdoc request is sent.
+> Note: the technical mechanism by which this authentication is achieved is not yet determined.
 
 #### 2.5.2.1 Rate Limiting
 
@@ -275,7 +276,7 @@ In addition to the above main functional requirement, several security objective
 
 | Enumeration   | Objective                                           | Description     |
 |---------------|-----------------------------------------------------|-----------------|
-| _O1_          | Authentication of the Verifier.                     | For some use cases, a Holder may wish to authenticate the Verifier to whom they are making the presentation. The requirements for the degree of certainty of authentication may vary widely from use case to use case.     |
+| _O1_          | Authentication of the Verifier Wallet Unit.         | A Holder Wallet Unit authenticates the Verifier Wallet Unit before presenting attributes. The required degree of certainty may vary by use case.                                                                          |
 | _O2_          | Preventing WRPs from misusing the W2W functionality. | WRPs are subject to registration requirements for relying on EUDI Wallets for presentation of attributes. It is an objective to ensure that WRPs do not use the W2W functionality to rely on presentations and thereby circumvent the registration requirements. |
 | _O3_          | Prevention of data collection.                      | The W2W functionality must not enable the unnecessary collection of data. In particular, it must be made difficult for a Verifier to persist the presentation received from a Holder.  |
 
@@ -293,19 +294,6 @@ If the use case requires it, the Holder and Verifier may opt to reverse roles of
 
 This technical specification also encompasses technical mechanisms to help achieve _O2_ and _O3_. In particular, the requirements about rate limiting makes it cumbersome for Relying Parties to use an authentic Wallet Unit, due to the limited rate of presentations. This helps towards achieving _O2_ and also makes it impossible to use an authentic Wallet Unit for large scale data collection (i.e., achieving _O3_). The requirement that a Verifier Wallet Unit shall not persist the data in a received presentation further renders it difficult to use a authentic Wallet Unit for collecting data (helping achieve _O3_). We note that, a fraudulent Relying Party may try to use a fake Wallet Unit to circumvent these. 
 
-#### A.2.2 Possible Enhancements
+#### A.2.2 Verifier Wallet Unit Authentication
 
-To further strengthen the effectiveness of the above technical requirements, this specification could design a technical mechanism ensuring that a Holder Wallet Unit will only make a presentation towards a valid (i.e., authentic and non-revoked) Verifier Wallet Unit.
-For this purpose, the ISO/IEC 18013-5 protocol provides `mdoc reader authentication`, which essentially means that the Verifier (the mdoc reader) signs some data and adds the signature in the `ReaderAuth` structure in the `mdoc request`.
-However, this signature is based on the use of X.509 certificates. In the EUDI Wallet ecosystem as current designed in the ARF, a Verifier Wallet Unit does not have such a certificate. (In contrast, a WRP has a X.509 access certificate, which it receives during registration.)
-Therefore, to authenticate a Verifier Wallet Unit, two options exist:
-
-1. Modify the mechanism to be compatible with the Wallet App Attestation (WAA) from [TS3 Wallet Unit Attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts3-wallet-unit-attestation.md), which is a JWT issued by the Wallet Provider. While the WAA may be mapped to CBOR (i.e. to a CWT) as specified in [CBOR Web Token](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/413), some changes to the `ReaderAuth` functionality would be needed. This will make ISO/IEC 18013-5 compliance much harder to achieve and would (ideally) require changes to the standard, which would be a fairly slow process. Note further, that the WAA is ephemeral or has an expiration time of less than 24 hours, meaning that imposing such mechanism would render the W2W functionality impossible to use offline.
-
-> In fact, to achieve a high degree of certainty of talking to a Wallet Unit it is necessary to let such certificate/attestation have a short time to live.
-
-2. The Wallet Provider could also issue an X.509 authentication certificate to each Wallet Unit directly, in which case ISO/IEC 18013-5 `ReaderAuth` can be used unmodified. While this would achieve compliance to the standard, it would put an additional burden on Wallet Providers and add technical complexity to the ecosystem, as Wallet Providers would now also have to issue and handle X.509 certificates in addition to the existing JWT-based WUAs and WAAs.
-
-> Note that even with such envisioned hardening _O2_ and _O3_ will not be fully guaranteed. In particular, it will always be technically possible for an WRP to misuse the W2W functionality to receive presentations - only the scale and usefulness of this can be reduced. Moreover, a Verifier may extract data from a presentation using out-of-band mechanisms, for instance by writing notes or taking photos of the presentation. In the extreme, a Verifier may simply remember the received presentation and persist it when not observed.
-
-Based on the above discussion of security objectives and methods for reaching these, this specification opts to let out-of-band mechanisms ensure a baseline of _O1_, _O2_, and _O3_. Further, the specification encompasses requirements for Verifier Wallet Units on rate limiting and non-persistence of presented attributes to achieve _O2_ and _O3_. Finally, in high-assurance cases a reversed W2W interaction can be used to obtain _O1_ with high certainty. We deem that the additional complexity for the ecosystem by hardening _O2_ and _O3_ with verifying the validity of Wallet Units outweighs its benefits and no such mechanism is therefore included in the specification.
+For analysis of candidate technical mechanisms to satisfy the Verifier Wallet Unit authentication requirement, see the [Topic J RR Wallet-to-Wallet Interactions discussion paper](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/discussion-topics/j-rr-wallet-to-wallet-interactions.md).
